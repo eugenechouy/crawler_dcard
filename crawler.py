@@ -1,3 +1,4 @@
+#encoding: utf-8
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -15,7 +16,7 @@ def find(url):
 main_url = "https://www.dcard.tw/f"
 api_url = "https://www.dcard.tw/_api/posts"
 
-file = open("text.txt", "w", encoding="UTF-8")
+file = open("result.txt", "w", encoding="UTF-8")
 
 p = requests.Session()
 resp = requests.get(main_url)
@@ -39,19 +40,20 @@ for k in range(0, 10):
         temp = "/f/pet/p/" + str(data[u]["id"]) + "-" + str(data[u]["title"].replace(" ", "-"))
         a.append(temp)
 
-print("OK")
 j = 0
 for i in a:
     url = "http://www.dcard.tw" + i
     j += 1
-    file.write("第 {} 頁的URL為: {} \n".format(j,url))
+    file.write("第 {} 篇, URL為: {} \n".format(j,url))
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text, "html.parser")
+    title = soup.select("div.Post_meta_MVFsOq h1.Post_title_2O-1el")
+    file.write(title[0].string + "\n")
     content = soup.select("div.Post_content_NKEl9d div div div")
     for s in content:
         if s.string:
-            file.write(s.string)
-    file.write("\n-------------------------------------------------------\n")
+            file.write(s.string + "\n")    
+    file.write("-------------------------------------------------------\n\n")
 
 file.close()
 print("爬蟲結束")
